@@ -8,7 +8,7 @@
             mc:Ignorable="d"
             Title="网络转串口工具"
             Height="500"
-            Width="800"
+            Width="810"
             FontFamily="{StaticResource PanuonIconFont}"
             Background="#252526"
             Foreground="#FFFFFF"
@@ -179,17 +179,131 @@
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="80"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0" Background="#3F3F40" Margin="5">
-                
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <TextBlock 
+                            FontSize="14"
+                            Text="网络->串口" 
+                            VerticalAlignment="Center" 
+                            Margin="5 0 0 0 "
+                        />
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock 
+                            FontSize="14"
+                            Text="模式：" 
+                            VerticalAlignment="Center" 
+                        />
+                            <ComboBox 
+                            Height="25"
+                            Width="80"
+                            Margin="0 0 20 0"
+                            pu:ComboBoxHelper.ItemsHeight="30"
+                        />
+                            <CheckBox 
+                            Content="换行"
+                            Foreground="#FFFFFF"
+                            Background="#FFFFFF"
+                            Margin="0 0 20 0"
+                        />
+                            <Button 
+                            Height="25"
+                            Width="70"
+                            Content="清空"
+                            Background="#FFF56059"
+                            Foreground="#FFFFFF"
+                            pu:IconHelper.Margin="0,0,10,0"
+                            pu:ButtonHelper.CornerRadius="4"
+                        />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <TextBox 
+                        Background="#3F3F40"
+                        Foreground="#FFFFFF"
+                        Text="" 
+                        TextAlignment="Left" 
+                        VerticalContentAlignment="Top"
+                        IsReadOnly="True" 
+                        AcceptsReturn="True" 
+                        VerticalScrollBarVisibility="Auto" 
+                    />
+                </Grid>
             </Grid>
-            <Grid Grid.Column="1">
-
-            </Grid>
-            <Grid Grid.Column="2" Background="#3F3F40" Margin="5">
-
+            <Grid Grid.Column="1" Background="#3F3F40" Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <TextBlock 
+                            FontSize="14"
+                            Text="串口->网络" 
+                            VerticalAlignment="Center" 
+                            Margin="5 0 0 0 "
+                        />
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock 
+                            FontSize="14"
+                            Text="模式：" 
+                            VerticalAlignment="Center" 
+                        />
+                            <ComboBox 
+                            Height="25"
+                            Width="80"
+                            Margin="0 0 20 0"
+                            pu:ComboBoxHelper.ItemsHeight="30"
+                        />
+                            <CheckBox 
+                            Content="换行"
+                            Foreground="#FFFFFF"
+                            Background="#FFFFFF"
+                            Margin="0 0 20 0"
+                        />
+                            <Button 
+                            Height="25"
+                            Width="70"
+                            Content="清空"
+                            Background="#FFF56059"
+                            Foreground="#FFFFFF"
+                            pu:IconHelper.Margin="0,0,10,0"
+                            pu:ButtonHelper.CornerRadius="4"
+                        />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <TextBox 
+                        Background="#3F3F40"
+                        Foreground="#FFFFFF"
+                        Text="" 
+                        TextAlignment="Left" 
+                        VerticalContentAlignment="Top"
+                        IsReadOnly="True" 
+                        AcceptsReturn="True" 
+                        VerticalScrollBarVisibility="Auto" 
+                    />
+                </Grid>
             </Grid>
         </Grid>
     </Grid>
