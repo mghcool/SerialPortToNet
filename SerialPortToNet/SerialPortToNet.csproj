@@ -9,10 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="Panuon.WPF.UI" Version="1.1.15.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\" />
+    <PackageReference Include="System.IO.Ports" Version="7.0.0" />
+    <PackageReference Include="System.Management" Version="7.0.2" />
   </ItemGroup>
 
 </Project>

@@ -4,11 +4,12 @@
             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
             xmlns:local="clr-namespace:SerialPortToNet"
-            xmlns:pu="https://opensource.panuon.com/wpf-ui"
+            DataContext="{StaticResource MainWindowVM}"
+            xmlns:pu="https://opensource.panuon.com/wpf-ui" 
             mc:Ignorable="d"
             Title="网络转串口工具"
             Height="500"
-            Width="810"
+            Width="860"
             FontFamily="{StaticResource PanuonIconFont}"
             Background="#252526"
             Foreground="#FFFFFF"
@@ -21,7 +22,9 @@
             pu:WindowXCaption.ShadowColor="#7E8E8E"
             pu:ShadowHelper.BlurRadius="15"
             pu:ShadowHelper.ShadowDepth="2"
-            WindowStartupLocation="CenterScreen">
+            WindowStartupLocation="CenterScreen" 
+            Loaded="WindowX_Loaded"
+        >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="60" />
@@ -29,7 +32,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="5" Background="#3F3F40">
+        <Grid Grid.Row="0" Margin="5" Background="#3F3F40" IsEnabled="{Binding EditEnable, Mode=OneWay}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <TextBlock 
                     FontSize="14"
@@ -37,9 +40,12 @@
                     VerticalAlignment="Center" 
                 />
                 <ComboBox 
+                    ItemsSource="{Binding PortNameItems, Mode=OneWay}"
+                    SelectedIndex="{Binding CheckedPortNameIndex, Mode=TwoWay}"
                     Height="25"
                     Width="200"
                     Margin="5 0 5 0"
+                    IsReadOnly="True"
                     pu:ComboBoxHelper.ItemsHeight="30"
                 />
                 <Button 
@@ -51,7 +57,7 @@
                     Foreground="#FFFFFF"
                     FontFamily="{StaticResource PanuonIconFont}"
                     FontSize="14"
-                    pu:ButtonHelper.CornerRadius="5" 
+                    pu:ButtonHelper.CornerRadius="5" Click="BtnRefresh_Click" 
                 />
                 <TextBlock 
                     FontSize="14"
@@ -59,10 +65,13 @@
                     VerticalAlignment="Center" 
                 />
                 <ComboBox 
+                    ItemsSource="{Binding BaudRateItems}"
+                    SelectedItem="{Binding CheckedBaudRate, Mode=TwoWay}"
                     Height="25"
                     Width="80"
                     Margin="5 0 5 0"
-                    pu:ComboBoxHelper.ItemsHeight="30"
+                    IsEditable="True"
+                    PreviewTextInput="CobxBaudRate_PreviewTextInput" 
                 />
                 <TextBlock 
                     FontSize="14"
@@ -70,10 +79,11 @@
                     VerticalAlignment="Center" 
                 />
                 <ComboBox 
+                    ItemsSource="{Binding DataBitItems, Mode=OneTime}"
+                    SelectedItem="{Binding CheckedDataBit, Mode=TwoWay}"
                     Height="25"
-                    Width="40"
+                    Width="50"
                     Margin="5 0 5 0"
-                    pu:ComboBoxHelper.ItemsHeight="30"
                 />
                 <TextBlock 
                     FontSize="14"
@@ -81,10 +91,11 @@
                     VerticalAlignment="Center" 
                 />
                 <ComboBox 
+                    ItemsSource="{Binding ParityItems, Mode=OneTime}"
+                    SelectedItem="{Binding CheckedParity, Mode=TwoWay}"
                     Height="25"
                     Width="80"
                     Margin="5 0 5 0"
-                    pu:ComboBoxHelper.ItemsHeight="30"
                 />
                 <TextBlock 
                     FontSize="14"
@@ -92,10 +103,11 @@
                     VerticalAlignment="Center" 
                 />
                 <ComboBox 
+                    ItemsSource="{Binding StopBitsItems, Mode=OneTime}"
+                    SelectedIndex="{Binding CheckedStopBitsIndex, Mode=TwoWay}"
                     Height="25"
-                    Width="40"
+                    Width="50"
                     Margin="5 0 5 0"
-                    pu:ComboBoxHelper.ItemsHeight="30"
                 />
             </StackPanel>
             
@@ -103,23 +115,24 @@
 
         <Grid Grid.Row="1" Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="450"/>
+                <ColumnDefinition Width="480"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="150"/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0" Background="#3F3F40" Margin="0 0 5 0">
+            <Grid Grid.Column="0" Background="#3F3F40" Margin="0 0 5 0" IsEnabled="{Binding EditEnable, Mode=OneWay}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock 
                         FontSize="14"
-                        Text="模式：" 
+                        Text="网络模式：" 
                         VerticalAlignment="Center" 
                     />
                     <ComboBox 
+                        ItemsSource="{Binding NetworkModeItems, Mode=OneTime}"
+                        SelectedIndex="{Binding CheckedNetworkModeIndex, Mode=TwoWay}"
                         Height="25"
                         Width="80"
                         Margin="0 0 5 0"
-                        pu:ComboBoxHelper.ItemsHeight="30"
                     />
                     <TextBlock 
                         FontSize="14"
@@ -127,8 +140,9 @@
                         VerticalAlignment="Center" 
                     />
                     <TextBox 
+                        Text="{Binding NetAddress, Mode=TwoWay}"
                         Height="25"
-                        Width="100"
+                        Width="105"
                         Margin="0 0 5 0"
                     />
                     <TextBlock 
@@ -137,6 +151,7 @@
                         VerticalAlignment="Center" 
                     />
                     <pu:NumberInput 
+                        Value="{Binding NetPort}"
                         Foreground="Black"
                         Minimum="0"
                         Maximum="65535"
@@ -156,23 +171,27 @@
                     />
                     <TextBlock 
                         FontSize="14"
-                        Text="无" HorizontalAlignment="Center" 
+                        Text="{Binding CurrentConnection, Mode=OneWay}" 
+                        HorizontalAlignment="Center" 
                     />
                 </StackPanel>
             </Grid>
             <Grid Grid.Column="2" Background="#3F3F40">
-                <Button Height="30"
+                <Button x:Name="BtnStart"
+                    Height="30"
                     Width="100"
-                    Content="启动"
+                    Content="&#xE9E9; 启动"
                     Background="#36AAF7"
                     Foreground="#FFFFFF"
+                    FontSize="14"
                     pu:IconHelper.FontFamily="{StaticResource PanuonIconFont}"
                     pu:IconHelper.Margin="0,0,10,0"
-                    pu:ButtonHelper.Icon="&#xE9E9;"
                     pu:ButtonHelper.CornerRadius="4"
                     pu:ButtonHelper.ShadowColor="#36AAF7"
                     pu:ShadowHelper.BlurRadius="15"
-                    pu:ShadowHelper.ShadowDepth="5" />
+                    pu:ShadowHelper.ShadowDepth="5" 
+                    Click="BtnStart_Click" 
+                    />
             </Grid>
         </Grid>
 
@@ -196,50 +215,55 @@
                             FontSize="14"
                             Text="网络->串口" 
                             VerticalAlignment="Center" 
-                            Margin="5 0 0 0 "
+                            Margin="5 0 0 0 " 
+                            HorizontalAlignment="Center"
                         />
                     </Grid>
                     <Grid Grid.Column="1">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock 
-                            FontSize="14"
-                            Text="模式：" 
-                            VerticalAlignment="Center" 
-                        />
+                                FontSize="14"
+                                Text="模式：" 
+                                VerticalAlignment="Center" 
+                            />
                             <ComboBox 
-                            Height="25"
-                            Width="80"
-                            Margin="0 0 20 0"
-                            pu:ComboBoxHelper.ItemsHeight="30"
-                        />
+                                ItemsSource="{Binding EncodingModeItems, Mode=OneTime}"
+                                SelectedItem="{Binding CheckedNet2SPortEncodingMode, Mode=TwoWay}"
+                                Height="25"
+                                Width="80"
+                                Margin="0 0 20 0"
+                            />
                             <CheckBox 
-                            Content="换行"
-                            Foreground="#FFFFFF"
-                            Background="#FFFFFF"
-                            Margin="0 0 20 0"
-                        />
+                                IsChecked="{Binding NetToSerialPortNewLine, Mode=TwoWay}"
+                                Content="换行"
+                                Foreground="#FFFFFF"
+                                Background="#FFFFFF"
+                                Margin="0 0 20 0"
+                            />
                             <Button 
-                            Height="25"
-                            Width="70"
-                            Content="清空"
-                            Background="#FFF56059"
-                            Foreground="#FFFFFF"
-                            pu:IconHelper.Margin="0,0,10,0"
-                            pu:ButtonHelper.CornerRadius="4"
-                        />
+                                Height="25"
+                                Width="70"
+                                Content="清空"
+                                Background="#F56059"
+                                Foreground="#FFFFFF"
+                                pu:IconHelper.Margin="0,0,10,0"
+                                pu:ButtonHelper.CornerRadius="4" 
+                                Click="BtnNetToSerialPortClear_Click"
+                            />
                         </StackPanel>
                     </Grid>
                 </Grid>
                 <Grid Grid.Row="1">
-                    <TextBox 
+                    <TextBox x:Name="TbxNet2SPort"
                         Background="#3F3F40"
                         Foreground="#FFFFFF"
-                        Text="" 
+                        Text="{Binding NetToSerialPortData, Mode=OneWay}" 
                         TextAlignment="Left" 
                         VerticalContentAlignment="Top"
                         IsReadOnly="True" 
                         AcceptsReturn="True" 
-                        VerticalScrollBarVisibility="Auto" 
+                        VerticalScrollBarVisibility="Auto"
+                        TextWrapping="Wrap"
                     />
                 </Grid>
             </Grid>
@@ -259,49 +283,54 @@
                             Text="串口->网络" 
                             VerticalAlignment="Center" 
                             Margin="5 0 0 0 "
+                            HorizontalAlignment="Center"
                         />
                     </Grid>
                     <Grid Grid.Column="1">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock 
-                            FontSize="14"
-                            Text="模式：" 
-                            VerticalAlignment="Center" 
-                        />
+                                FontSize="14"
+                                Text="模式：" 
+                                VerticalAlignment="Center" 
+                            />
                             <ComboBox 
-                            Height="25"
-                            Width="80"
-                            Margin="0 0 20 0"
-                            pu:ComboBoxHelper.ItemsHeight="30"
-                        />
+                                ItemsSource="{Binding EncodingModeItems, Mode=OneTime}"
+                                SelectedItem="{Binding CheckedSPort2NetEncodingMode, Mode=TwoWay}"
+                                Height="25"
+                                Width="80"
+                                Margin="0 0 20 0"
+                            />
                             <CheckBox 
-                            Content="换行"
-                            Foreground="#FFFFFF"
-                            Background="#FFFFFF"
-                            Margin="0 0 20 0"
-                        />
+                                IsChecked="{Binding SerialPortToNetNewLine, Mode=TwoWay}"
+                                Content="换行"
+                                Foreground="#FFFFFF"
+                                Background="#FFFFFF"
+                                Margin="0 0 20 0"
+                            />
                             <Button 
-                            Height="25"
-                            Width="70"
-                            Content="清空"
-                            Background="#FFF56059"
-                            Foreground="#FFFFFF"
-                            pu:IconHelper.Margin="0,0,10,0"
-                            pu:ButtonHelper.CornerRadius="4"
-                        />
+                                Height="25"
+                                Width="70"
+                                Content="清空"
+                                Background="#F56059"
+                                Foreground="#FFFFFF"
+                                pu:IconHelper.Margin="0,0,10,0"
+                                pu:ButtonHelper.CornerRadius="4"
+                                Click="BtnSerialPortToNetClear_Click"
+                            />
                         </StackPanel>
                     </Grid>
                 </Grid>
                 <Grid Grid.Row="1">
-                    <TextBox 
+                    <TextBox x:Name="TbxSPort2Net"
                         Background="#3F3F40"
                         Foreground="#FFFFFF"
-                        Text="" 
+                        Text="{Binding SerialPortToNetData, Mode=OneWay}" 
                         TextAlignment="Left" 
                         VerticalContentAlignment="Top"
                         IsReadOnly="True" 
                         AcceptsReturn="True" 
                         VerticalScrollBarVisibility="Auto" 
+                        TextWrapping="Wrap"
                     />
                 </Grid>
             </Grid>
