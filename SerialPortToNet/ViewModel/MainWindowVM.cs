@@ -10,7 +10,22 @@ namespace SerialPortToNet.ViewModel
     /// </summary>
     public class MainWindowVM : ObservableObject
     {
-        public string Title { get; set; } = $"网络转串口工具 v{FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).ProductVersion}";
+        /// <summary>
+        /// 主窗口标题
+        /// </summary>
+        public string Title
+        {
+            get
+            {
+                string title = "网络转串口工具";
+                string? fullPath = Process.GetCurrentProcess().MainModule?.FileName;
+                if (fullPath != null)
+                {
+                    title += $" v{FileVersionInfo.GetVersionInfo(fullPath).ProductVersion}";
+                }
+                return title;
+            }
+        }
 
         #region 串口配置
         #region 选项
