@@ -7,6 +7,7 @@
     {
         HEX,
         ASCII,
-        UTF8
+        UTF8,
+        GBK
     }
 }

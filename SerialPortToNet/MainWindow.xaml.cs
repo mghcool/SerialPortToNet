@@ -355,14 +355,17 @@ namespace SerialPortToNet
         private string BytesToString(byte[] buffer, EncodingMode encodingMode)
         {
             string str;
-
-            if (encodingMode == EncodingMode.ASCII)
-                str = Encoding.ASCII.GetString(buffer);
-            else if (encodingMode == EncodingMode.UTF8)
-                str = Encoding.UTF8.GetString(buffer);
-            else
-                str = BitConverter.ToString(buffer).Replace('-', ' ');
-
+            switch (encodingMode)
+            {
+                case EncodingMode.ASCII:
+                    str = Encoding.ASCII.GetString(buffer); break;
+                case EncodingMode.UTF8:
+                    str = Encoding.UTF8.GetString(buffer); break;
+                case EncodingMode.GBK:
+                    str = Encoding.GetEncoding("GBK").GetString(buffer); break;
+                default:
+                    str = BitConverter.ToString(buffer).Replace('-', ' '); break;
+            }
             return str;
         }
     }

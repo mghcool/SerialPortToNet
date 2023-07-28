@@ -106,7 +106,7 @@ namespace SerialPortToNet.ViewModel
         /// <summary>
         /// 数据编码模式选项
         /// </summary>
-        public EncodingMode[] EncodingModeItems { get; set; } = new EncodingMode[] { EncodingMode.HEX, EncodingMode.ASCII, EncodingMode.UTF8 };
+        public EncodingMode[] EncodingModeItems { get; set; } = new EncodingMode[] { EncodingMode.HEX, EncodingMode.ASCII, EncodingMode.UTF8, EncodingMode.GBK };
 
         /// <summary>
         /// 选中的网络->串口数据编码模式

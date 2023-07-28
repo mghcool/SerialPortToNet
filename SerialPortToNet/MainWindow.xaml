@@ -226,7 +226,7 @@
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock 
                                 FontSize="14"
-                                Text="模式：" 
+                                Text="编码：" 
                                 VerticalAlignment="Center" 
                             />
                             <ComboBox 
@@ -293,7 +293,7 @@
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock 
                                 FontSize="14"
-                                Text="模式：" 
+                                Text="编码：" 
                                 VerticalAlignment="Center" 
                             />
                             <ComboBox 
