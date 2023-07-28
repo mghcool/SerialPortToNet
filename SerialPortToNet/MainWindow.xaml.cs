@@ -8,7 +8,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -303,6 +302,15 @@ namespace SerialPortToNet
                 _tcpClient = null;
                 _serialPort.DataReceived -= SerialPortReceiveHandler;
                 _mainWindowVM.CurrentConnection = $"无";
+                if(_mainWindowVM.CheckedNetworkModeIndex == 1 && !_mainWindowVM.EditEnable)
+                {
+                    // 当tcp连接断开时，如果是客户端模式，那么模拟点击一下停止按钮
+                    Dispatcher.InvokeAsync(() =>
+                    {
+                        BtnStart_Click(new(), new());
+                        Toast("连接已断开！");
+                    });
+                }
             });
         }
 
