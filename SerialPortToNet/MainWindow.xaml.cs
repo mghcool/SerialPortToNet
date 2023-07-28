@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Panuon.WPF.UI;
@@ -84,13 +85,29 @@ namespace SerialPortToNet
             if (_mainWindowVM.EditEnable)
             {
                 _mainWindowVM.EditEnable = false;
+                SetBtnStartStyle(true);
+            }
+            else
+            {
+                _mainWindowVM.EditEnable = true;
+                SetBtnStartStyle(false);
+            }
+        }
+
+        /// <summary>
+        /// 设置启动按钮的样式
+        /// </summary>
+        /// <param name="isStart">true：设置为启动后的样式，false：设置为关闭后的样式</param>
+        private void SetBtnStartStyle(bool isStart)
+        {
+            if (isStart)
+            {
                 BtnStart.Content = "\uE9EA 停止";
                 BtnStart.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F56059"));
                 ButtonHelper.SetShadowColor(BtnStart, (Color)ColorConverter.ConvertFromString("#F56059"));
             }
             else
             {
-                _mainWindowVM.EditEnable = true;
                 BtnStart.Content = "\uE9E9 启动";
                 BtnStart.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#36AAF7"));
                 ButtonHelper.SetShadowColor(BtnStart, (Color)ColorConverter.ConvertFromString("#36AAF7"));
@@ -113,6 +130,24 @@ namespace SerialPortToNet
         private void CobxBaudRate_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             e.Handled = new Regex("[^0-9]+").IsMatch(e.Text);
+        }
+
+        // 网络模式选中项事件
+        private void CobxNetMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(_mainWindowVM is not null)
+            {
+                if (_mainWindowVM.CheckedNetworkModeIndex == 0)
+                {
+                    _mainWindowVM.NetAddressIsEnable = false;
+                    _mainWindowVM.NetAddress = "0.0.0.0";
+                }
+                else if (_mainWindowVM.CheckedNetworkModeIndex == 1)
+                {
+                    _mainWindowVM.NetAddressIsEnable = true;
+                    _mainWindowVM.NetAddress = "127.0.0.1";
+                }
+            }
         }
     }
 }

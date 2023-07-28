@@ -74,7 +74,12 @@ namespace SerialPortToNet.ViewModel
         /// <summary>
         /// 网络地址
         /// </summary>
-        public string NetAddress { get; set; } = "0.0.0.0";
+        public string NetAddress
+        {
+            get => _netAddress;
+            set => SetProperty(ref _netAddress, value);
+        }
+        private string _netAddress = "0.0.0.0";
 
         /// <summary>
         /// 网络服务端口
@@ -85,6 +90,16 @@ namespace SerialPortToNet.ViewModel
         /// 选中的网络服务模式索引，服务端或客户端
         /// </summary>
         public int CheckedNetworkModeIndex { get; set; } = 0;
+
+        /// <summary>
+        /// IP地址输入框使能
+        /// </summary>
+        public bool NetAddressIsEnable
+        {
+            get => _netAddressIsEnable;
+            set => SetProperty(ref _netAddressIsEnable, value);
+        }
+        private bool _netAddressIsEnable = false;
         #endregion
 
         #region 数据展示框
@@ -119,7 +134,7 @@ namespace SerialPortToNet.ViewModel
         public string NetToSerialPortData
         {
             get => _netToSerialPortData;
-            set { SetProperty(ref _netToSerialPortData, value); }
+            set => SetProperty(ref _netToSerialPortData, value);
         }
         private string _netToSerialPortData = string.Empty;
 
@@ -129,7 +144,7 @@ namespace SerialPortToNet.ViewModel
         public string SerialPortToNetData
         {
             get => _serialPortToNetData;
-            set { SetProperty(ref _serialPortToNetData, value); }
+            set => SetProperty(ref _serialPortToNetData, value);
         }
         private string _serialPortToNetData = string.Empty;
         #endregion
@@ -140,7 +155,7 @@ namespace SerialPortToNet.ViewModel
         public string CurrentConnection
         {
             get => _currentConnection;
-            set { SetProperty(ref _currentConnection, value); }
+            set => SetProperty(ref _currentConnection, value);
         }
         private string _currentConnection = "无";
 
@@ -150,7 +165,7 @@ namespace SerialPortToNet.ViewModel
         public bool EditEnable
         {
             get => _editEnable;
-            set { SetProperty(ref _editEnable, value); }
+            set => SetProperty(ref _editEnable, value);
         }
         private bool _editEnable = true;
     }
