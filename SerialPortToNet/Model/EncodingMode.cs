@@ -3,7 +3,7 @@
     /// <summary>
     /// 数据编码方式
     /// </summary>
-    public enum DataEncodingMode
+    public enum EncodingMode
     {
         HEX,
         ASCII,

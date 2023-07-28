@@ -69,7 +69,7 @@ namespace SerialPortToNet.ViewModel
         /// <summary>
         /// 网络服务类型
         /// </summary>
-        public string[] NetworkModeItems { get; set; } = new string[] { "TCP服务器", "TCP客户端" };
+        public NetworkMode[] NetworkModeItems { get; set; } = new NetworkMode[] { NetworkMode.TCP服务器, NetworkMode.TCP客户端 };
 
         /// <summary>
         /// 网络地址
@@ -87,9 +87,9 @@ namespace SerialPortToNet.ViewModel
         public int NetPort { get; set; } = 60000;
 
         /// <summary>
-        /// 选中的网络服务模式索引，服务端或客户端
+        /// 选中的网络服务模式
         /// </summary>
-        public int CheckedNetworkModeIndex { get; set; } = 0;
+        public NetworkMode CheckedNetworkMode { get; set; } = NetworkMode.TCP服务器;
 
         /// <summary>
         /// IP地址输入框使能
@@ -106,17 +106,17 @@ namespace SerialPortToNet.ViewModel
         /// <summary>
         /// 数据编码模式选项
         /// </summary>
-        public DataEncodingMode[] EncodingModeItems { get; set; } = new DataEncodingMode[] { DataEncodingMode.HEX, DataEncodingMode.ASCII, DataEncodingMode.UTF8 };
+        public EncodingMode[] EncodingModeItems { get; set; } = new EncodingMode[] { EncodingMode.HEX, EncodingMode.ASCII, EncodingMode.UTF8 };
 
         /// <summary>
         /// 选中的网络->串口数据编码模式
         /// </summary>
-        public DataEncodingMode CheckedNet2SPortEncodingMode { get; set; } = DataEncodingMode.HEX;
+        public EncodingMode CheckedNet2SPortEncodingMode { get; set; } = EncodingMode.HEX;
 
         /// <summary>
         /// 选中的串口->网络数据编码模式
         /// </summary>
-        public DataEncodingMode CheckedSPort2NetEncodingMode { get; set; } = DataEncodingMode.HEX;
+        public EncodingMode CheckedSPort2NetEncodingMode { get; set; } = EncodingMode.HEX;
 
         /// <summary>
         /// 网络->串口是否自动换行

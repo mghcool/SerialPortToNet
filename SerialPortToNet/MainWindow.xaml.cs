@@ -51,9 +51,13 @@ namespace SerialPortToNet
         {
             if (_mainWindowVM.EditEnable)
             {
-                _serialPort.Close();
-                _tcpListener?.Stop();
-                _tcpClient?.Disconnect(false);
+                try
+                {
+                    _serialPort.Close();
+                    _tcpListener?.Stop();
+                    _tcpClient?.Disconnect(false);
+                }
+                catch { }
             }
         }
 
@@ -109,7 +113,7 @@ namespace SerialPortToNet
                     MessageBoxX.Show(this, ex.Message, $"打开{_serialPort.PortName}失败", MessageBoxIcon.Error);
                     return;
                 }
-                if(_mainWindowVM.CheckedNetworkModeIndex == 0)
+                if(_mainWindowVM.CheckedNetworkMode == 0)
                 {
                     // 服务模式
                     _tcpListener = new TcpListener(IPAddress.Any, _mainWindowVM.NetPort);
@@ -125,7 +129,7 @@ namespace SerialPortToNet
                         return;
                     }
                 }
-                else if (_mainWindowVM.CheckedNetworkModeIndex == 1)
+                else if (_mainWindowVM.CheckedNetworkMode == NetworkMode.TCP客户端)
                 {
                     // 客户端模式
                     _tcpClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -210,12 +214,12 @@ namespace SerialPortToNet
         {
             if(_mainWindowVM is not null)
             {
-                if (_mainWindowVM.CheckedNetworkModeIndex == 0)
+                if (_mainWindowVM.CheckedNetworkMode == NetworkMode.TCP服务器)
                 {
                     _mainWindowVM.NetAddressIsEnable = false;
                     _mainWindowVM.NetAddress = "0.0.0.0";
                 }
-                else if (_mainWindowVM.CheckedNetworkModeIndex == 1)
+                else if (_mainWindowVM.CheckedNetworkMode == NetworkMode.TCP客户端)
                 {
                     _mainWindowVM.NetAddressIsEnable = true;
                     _mainWindowVM.NetAddress = "127.0.0.1";
@@ -302,7 +306,7 @@ namespace SerialPortToNet
                 _tcpClient = null;
                 _serialPort.DataReceived -= SerialPortReceiveHandler;
                 _mainWindowVM.CurrentConnection = $"无";
-                if(_mainWindowVM.CheckedNetworkModeIndex == 1 && !_mainWindowVM.EditEnable)
+                if(_mainWindowVM.CheckedNetworkMode == NetworkMode.TCP客户端 && !_mainWindowVM.EditEnable)
                 {
                     // 当tcp连接断开时，如果是客户端模式，那么模拟点击一下停止按钮
                     Dispatcher.InvokeAsync(() =>
@@ -348,13 +352,13 @@ namespace SerialPortToNet
         /// <param name="buffer"></param>
         /// <param name="encodingMode"></param>
         /// <returns></returns>
-        private string BytesToString(byte[] buffer, DataEncodingMode encodingMode)
+        private string BytesToString(byte[] buffer, EncodingMode encodingMode)
         {
             string str;
 
-            if (encodingMode == DataEncodingMode.ASCII)
+            if (encodingMode == EncodingMode.ASCII)
                 str = Encoding.ASCII.GetString(buffer);
-            else if (encodingMode == DataEncodingMode.UTF8)
+            else if (encodingMode == EncodingMode.UTF8)
                 str = Encoding.UTF8.GetString(buffer);
             else
                 str = BitConverter.ToString(buffer).Replace('-', ' ');
