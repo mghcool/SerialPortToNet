@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO.Ports;
+using System.Linq;
 using System.Management;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +15,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Panuon.WPF.UI;
+using SerialPortToNet.Model;
 using SerialPortToNet.ViewModel;
 
 namespace SerialPortToNet
@@ -25,6 +32,11 @@ namespace SerialPortToNet
         /// </summary>
         private readonly Dictionary<string, string> _portList = new();
 
+
+        private SerialPort _serialPort = new SerialPort();
+        private TcpListener? _tcpListener;
+        private Socket? _tcpClient;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -34,21 +46,6 @@ namespace SerialPortToNet
         private void WindowX_Loaded(object sender, RoutedEventArgs e)
         {
             SearchSerialPort();
-
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    Thread.Sleep(1000);
-                    _mainWindowVM.NetToSerialPortData += $"{DateTime.Now} 1234567890\r\n";
-                    _mainWindowVM.SerialPortToNetData += $"{DateTime.Now} abcdefgh\r\n";
-                    Dispatcher.InvokeAsync(() =>
-                    {
-                        TbxNet2SPort.ScrollToEnd();
-                        TbxSPort2Net.ScrollToEnd();
-                    });
-                }
-            });
         }
 
         // 刷新串口按钮
@@ -82,8 +79,65 @@ namespace SerialPortToNet
         // 启动按钮
         private void BtnStart_Click(object sender, RoutedEventArgs e)
         {
+            if(!IPAddress.TryParse(_mainWindowVM.NetAddress, out var address))
+            {
+                MessageBoxX.Show(this, "IP地址格式错误，请重新输入！", MessageBoxIcon.Warning);
+                return;
+            }
+            
             if (_mainWindowVM.EditEnable)
             {
+                try
+                {
+                    _serialPort.PortName = _portList.Keys.ToArray()[_mainWindowVM.CheckedPortNameIndex];
+                    _serialPort.DataBits = _mainWindowVM.CheckedDataBit;
+                    _serialPort.Parity = _mainWindowVM.CheckedParity;
+                    _serialPort.StopBits = (StopBits)_mainWindowVM.CheckedStopBitsIndex;
+                    _serialPort.Open();
+                }
+                catch (Exception ex)
+                {
+                    MessageBoxX.Show(this, ex.Message, $"打开{_serialPort.PortName}失败", MessageBoxIcon.Error);
+                    return;
+                }
+                if(_mainWindowVM.CheckedNetworkModeIndex == 0)
+                {
+                    // 服务模式
+                    _tcpListener = new TcpListener(IPAddress.Any, _mainWindowVM.NetPort);
+                    try
+                    {
+                        _tcpListener.Start(1);
+                        StartTcpListen();
+                    }
+                    catch (Exception ex)
+                    {
+                        _serialPort.Close();
+                        MessageBoxX.Show(this, ex.Message, $"启动TCP服务失败", MessageBoxIcon.Error);
+                        return;
+                    }
+                }
+                else if (_mainWindowVM.CheckedNetworkModeIndex == 1)
+                {
+                    // 客户端模式
+                    _tcpClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    var handler = PendingBox.Show(this, "正在连接...", "提示");
+                    try
+                    {
+                        _tcpClient.Connect(address, _mainWindowVM.NetPort);
+                        handler.Close();
+                        _mainWindowVM.CurrentConnection = $"{_tcpClient.RemoteEndPoint}";
+                        TcpClientReceiveHandler();
+                        _serialPort.DataReceived += SerialPortReceiveHandler;
+                    }
+                    catch (Exception ex)
+                    {
+                        handler.Close();
+                        _serialPort.Close();
+                        MessageBoxX.Show(this, ex.Message, $"连接TCP服务失败", MessageBoxIcon.Error);
+                        return;
+                    }
+                }
+                // 更改界面
                 _mainWindowVM.EditEnable = false;
                 SetBtnStartStyle(true);
             }
@@ -91,6 +145,10 @@ namespace SerialPortToNet
             {
                 _mainWindowVM.EditEnable = true;
                 SetBtnStartStyle(false);
+                _serialPort.Close();
+                _tcpListener?.Stop();
+                _tcpListener = null;
+                _tcpClient?.Disconnect(false);
             }
         }
 
@@ -117,19 +175,25 @@ namespace SerialPortToNet
         // 网络->串口清空内容
         private void BtnNetToSerialPortClear_Click(object sender, RoutedEventArgs e)
         {
-
+            _mainWindowVM.NetToSerialPortData = string.Empty;
         }
 
         // 串口->网络清空内容
         private void BtnSerialPortToNetClear_Click(object sender, RoutedEventArgs e)
         {
-
+            _mainWindowVM.SerialPortToNetData = string.Empty;
         }
 
         // 波特率输入框通过事件限制输入数字
         private void CobxBaudRate_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             e.Handled = new Regex("[^0-9]+").IsMatch(e.Text);
+        }
+
+        // IP地址输入限制
+        private void CobxIPAddress_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = new Regex("[^0-9.]+").IsMatch(e.Text);
         }
 
         // 网络模式选中项事件
@@ -148,6 +212,136 @@ namespace SerialPortToNet
                     _mainWindowVM.NetAddress = "127.0.0.1";
                 }
             }
+        }
+
+
+        /// <summary>
+        /// 开启tcp监听线程
+        /// </summary>
+        private Task StartTcpListen()
+        {
+            if (_tcpListener == null) return Task.CompletedTask;
+            return Task.Run(() =>
+            {
+                while (true)
+                {
+                    Socket client;
+                    try
+                    {
+                        client = _tcpListener.AcceptSocket();
+                    }
+                    catch
+                    {
+                        break;
+                    }
+
+                    if (_tcpClient == null)
+                    {
+                        _tcpClient = client;
+                        _mainWindowVM.CurrentConnection = $"{_tcpClient.RemoteEndPoint}";
+                        TcpClientReceiveHandler();
+                        _serialPort.DataReceived += SerialPortReceiveHandler;
+                    }
+                    else
+                    {
+                        var sendData = Encoding.ASCII.GetBytes("The connection is not allowed because a client is currently connected .\r\n");
+                        client.Send(sendData);
+                        client.Disconnect(false);
+                        client.Close();
+                    }
+                }
+                Debug.WriteLine("监听线程结束");
+            });
+        }
+
+        /// <summary>
+        /// tcp接收数据处理
+        /// </summary>
+        /// <returns></returns>
+        private Task TcpClientReceiveHandler()
+        {
+            if (_tcpClient == null) return Task.CompletedTask;
+            return Task.Run(() =>
+            {
+                while (true)
+                {
+                    byte[] buffer = new byte[4096];
+                    int receiveLength;
+                    try
+                    {
+                        receiveLength = _tcpClient.Receive(buffer);
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                    if (receiveLength == 0) break;
+
+                    _serialPort.Write(buffer, 0, receiveLength);
+
+                    // 组织字符串
+                    byte[] receiveData = new byte[receiveLength];
+                    Array.Copy(buffer, receiveData, receiveLength);
+                    string str = string.Empty;
+                    if(_mainWindowVM.NetToSerialPortData != string.Empty) str += _mainWindowVM.NetToSerialPortNewLine ? "\r\n" : " ";
+                    str += BytesToString(receiveData, _mainWindowVM.CheckedNet2SPortEncodingMode);
+                    // 显示
+                    _mainWindowVM.NetToSerialPortData += str;
+                    Dispatcher.InvokeAsync(() => TbxNet2SPort.ScrollToEnd());
+                }
+                _tcpClient.Close();
+                _tcpClient = null;
+                _serialPort.DataReceived -= SerialPortReceiveHandler;
+                _mainWindowVM.CurrentConnection = $"无";
+            });
+        }
+
+        /// <summary>
+        /// 串口接收数据处理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SerialPortReceiveHandler(object sender, SerialDataReceivedEventArgs e)
+        {
+            int receiveLength = _serialPort.BytesToRead;
+            byte[] buffer = new byte[receiveLength];
+            _serialPort.Read(buffer, 0, receiveLength);
+            try
+            {
+                _tcpClient?.Send(buffer);
+            }
+            catch
+            {
+                _tcpClient = null;
+            }
+
+            // 组织字符串
+            string str = string.Empty;
+            if (_mainWindowVM.SerialPortToNetData != string.Empty) str += _mainWindowVM.SerialPortToNetNewLine ? "\r\n" : " ";
+            str += BytesToString(buffer, _mainWindowVM.CheckedSPort2NetEncodingMode);
+            // 显示
+            _mainWindowVM.SerialPortToNetData += str;
+            Dispatcher.InvokeAsync(() => TbxSPort2Net.ScrollToEnd());
+        }
+
+        /// <summary>
+        /// 字节数据根据编码方式转字符串
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="encodingMode"></param>
+        /// <returns></returns>
+        private string BytesToString(byte[] buffer, DataEncodingMode encodingMode)
+        {
+            string str;
+
+            if (encodingMode == DataEncodingMode.ASCII)
+                str = Encoding.ASCII.GetString(buffer);
+            else if (encodingMode == DataEncodingMode.UTF8)
+                str = Encoding.UTF8.GetString(buffer);
+            else
+                str = BitConverter.ToString(buffer).Replace('-', ' ');
+
+            return str;
         }
     }
 }
