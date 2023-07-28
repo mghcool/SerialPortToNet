@@ -44,7 +44,7 @@
                     SelectedIndex="{Binding CheckedPortNameIndex, Mode=TwoWay}"
                     Height="25"
                     Width="200"
-                    Margin="5 0 5 0"
+                    Margin="5 0 0 0"
                     IsReadOnly="True"
                     pu:ComboBoxHelper.ItemsHeight="30"
                 />
@@ -53,7 +53,7 @@
                     Width="25"
                     Margin="0 0 5 0"
                     Content="&#xE970;"
-                    Background="#FFA46B"
+                    Background="#656566"
                     Foreground="#FFFFFF"
                     FontFamily="{StaticResource PanuonIconFont}"
                     FontSize="14"
@@ -115,9 +115,9 @@
 
         <Grid Grid.Row="1" Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="480"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0" Background="#3F3F40" Margin="0 0 5 0" IsEnabled="{Binding EditEnable, Mode=OneWay}">
