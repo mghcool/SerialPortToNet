@@ -48,6 +48,16 @@ namespace SerialPortToNet
             SearchSerialPort();
         }
 
+        private void WindowX_Closed(object sender, EventArgs e)
+        {
+            if (_mainWindowVM.EditEnable)
+            {
+                _serialPort.Close();
+                _tcpListener?.Stop();
+                _tcpClient?.Disconnect(false);
+            }
+        }
+
         // 刷新串口按钮
         private void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {

@@ -24,6 +24,7 @@
             pu:ShadowHelper.ShadowDepth="2"
             WindowStartupLocation="CenterScreen" 
             Loaded="WindowX_Loaded"
+            Closed="WindowX_Closed"
         >
     <Grid>
         <Grid.RowDefinitions>
