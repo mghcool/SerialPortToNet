@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO.Ports;
 using SerialPortToNet.Model;
 
@@ -8,7 +7,7 @@ namespace SerialPortToNet.ViewModel
     /// <summary>
     /// 主窗体数据源
     /// </summary>
-    public class MainWindowVM : INotifyPropertyChanged
+    public class MainWindowVM : ObservableObject
     {
         #region 串口配置
         #region 选项
@@ -120,11 +119,7 @@ namespace SerialPortToNet.ViewModel
         public string NetToSerialPortData
         {
             get => _netToSerialPortData;
-            set
-            {
-                _netToSerialPortData = value;
-                OnPropertyChanged(nameof(NetToSerialPortData));
-            }
+            set { SetProperty(ref _netToSerialPortData, value); }
         }
         private string _netToSerialPortData = string.Empty;
 
@@ -134,11 +129,7 @@ namespace SerialPortToNet.ViewModel
         public string SerialPortToNetData
         {
             get => _serialPortToNetData;
-            set
-            {
-                _serialPortToNetData = value;
-                OnPropertyChanged(nameof(SerialPortToNetData));
-            }
+            set { SetProperty(ref _serialPortToNetData, value); }
         }
         private string _serialPortToNetData = string.Empty;
         #endregion
@@ -149,11 +140,7 @@ namespace SerialPortToNet.ViewModel
         public string CurrentConnection
         {
             get => _currentConnection;
-            set
-            {
-                _currentConnection = value;
-                OnPropertyChanged(nameof(CurrentConnection));
-            }
+            set { SetProperty(ref _currentConnection, value); }
         }
         private string _currentConnection = "无";
 
@@ -163,22 +150,8 @@ namespace SerialPortToNet.ViewModel
         public bool EditEnable
         {
             get => _editEnable;
-            set
-            {
-                _editEnable = value;
-                OnPropertyChanged(nameof(EditEnable));
-            }
+            set { SetProperty(ref _editEnable, value); }
         }
         private bool _editEnable = true;
-
-
-        #region 改变通知
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
     }
 }
