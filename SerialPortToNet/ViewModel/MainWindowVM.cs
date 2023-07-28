@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO.Ports;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SerialPortToNet.Model;
 
 namespace SerialPortToNet.ViewModel
 {
+    /// <summary>
+    /// 主窗体数据源
+    /// </summary>
     public class MainWindowVM : INotifyPropertyChanged
     {
         #region 串口配置
@@ -42,49 +40,109 @@ namespace SerialPortToNet.ViewModel
 
         #region 选中项
         /// <summary>
-        /// 选中的串口索引
+        /// 选中的串口选项索引
         /// </summary>
         public int CheckedPortNameIndex { get; set; }
+
+        /// <summary>
+        /// 选中的串口波特率
+        /// </summary>
         public int CheckedBaudRate { get; set; } = 9600;
+
+        /// <summary>
+        /// 选中的串口数据位
+        /// </summary>
         public int CheckedDataBit { get; set; } = 8;
-        public Parity CheckedParity{ get; set; } = Parity.None;
+
+        /// <summary>
+        /// 选中的串口校验
+        /// </summary>
+        public Parity CheckedParity { get; set; } = Parity.None;
+
+        /// <summary>
+        /// 选中的串口停止位选项索引
+        /// </summary>
         public int CheckedStopBitsIndex { get; set; } = 1;
         #endregion
         #endregion
 
         #region 网络配置
+        /// <summary>
+        /// 网络服务类型
+        /// </summary>
         public string[] NetworkModeItems { get; set; } = new string[] { "TCP服务器", "TCP客户端" };
 
-        public string NetAddress { get; set; } = "255.255.255.255";
+        /// <summary>
+        /// 网络地址
+        /// </summary>
+        public string NetAddress { get; set; } = "0.0.0.0";
 
+        /// <summary>
+        /// 网络服务端口
+        /// </summary>
         public int NetPort { get; set; } = 60000;
 
         /// <summary>
-        /// 网络模式，服务端或客户端
+        /// 选中的网络服务模式索引，服务端或客户端
         /// </summary>
         public int CheckedNetworkModeIndex { get; set; } = 0;
         #endregion
 
+        #region 数据展示框
         /// <summary>
         /// 数据编码模式选项
         /// </summary>
         public DataEncodingMode[] EncodingModeItems { get; set; } = new DataEncodingMode[] { DataEncodingMode.HEX, DataEncodingMode.ASCII, DataEncodingMode.UTF8 };
 
+        /// <summary>
+        /// 选中的网络->串口数据编码模式
+        /// </summary>
         public DataEncodingMode CheckedNet2SPortEncodingMode { get; set; } = DataEncodingMode.HEX;
+
+        /// <summary>
+        /// 选中的串口->网络数据编码模式
+        /// </summary>
         public DataEncodingMode CheckedSPort2NetEncodingMode { get; set; } = DataEncodingMode.HEX;
 
         /// <summary>
-        /// 网络->串口自动换行
+        /// 网络->串口是否自动换行
         /// </summary>
         public bool NetToSerialPortNewLine { get; set; } = false;
 
         /// <summary>
-        /// 串口->网络自动换行
+        /// 串口->网络是否自动换行
         /// </summary>
         public bool SerialPortToNetNewLine { get; set; } = false;
 
+        /// <summary>
+        /// 网络->串口的展示数据
+        /// </summary>
+        public string NetToSerialPortData
+        {
+            get => _netToSerialPortData;
+            set
+            {
+                _netToSerialPortData = value;
+                OnPropertyChanged(nameof(NetToSerialPortData));
+            }
+        }
+        private string _netToSerialPortData = string.Empty;
 
-        private string _currentConnection = "无";
+        /// <summary>
+        /// 串口->网络的展示数据
+        /// </summary>
+        public string SerialPortToNetData
+        {
+            get => _serialPortToNetData;
+            set
+            {
+                _serialPortToNetData = value;
+                OnPropertyChanged(nameof(SerialPortToNetData));
+            }
+        }
+        private string _serialPortToNetData = string.Empty;
+        #endregion
+
         /// <summary>
         /// 当前网络连接信息
         /// </summary>
@@ -97,8 +155,8 @@ namespace SerialPortToNet.ViewModel
                 OnPropertyChanged(nameof(CurrentConnection));
             }
         }
+        private string _currentConnection = "无";
 
-        private bool _editEnable = true;
         /// <summary>
         /// 编辑使能
         /// </summary>
@@ -111,36 +169,16 @@ namespace SerialPortToNet.ViewModel
                 OnPropertyChanged(nameof(EditEnable));
             }
         }
-
-        private string _netToSerialPortData = string.Empty;
-        public string NetToSerialPortData
-        {
-            get => _netToSerialPortData;
-            set 
-            { 
-                _netToSerialPortData = value;
-                OnPropertyChanged(nameof(NetToSerialPortData));
-            }
-        }
-
-        private string _serialPortToNetData = string.Empty;
-        public string SerialPortToNetData
-        {
-            get => _serialPortToNetData;
-            set
-            {
-                _serialPortToNetData = value;
-                OnPropertyChanged(nameof(SerialPortToNetData));
-            }
-        }
+        private bool _editEnable = true;
 
 
-
+        #region 改变通知
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        #endregion
     }
 }

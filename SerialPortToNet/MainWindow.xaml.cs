@@ -1,29 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Management;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Panuon.WPF.UI;
 using SerialPortToNet.ViewModel;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace SerialPortToNet
 {
     public partial class MainWindow : WindowX
     {
+        /// <summary>
+        /// 绑定的数据源
+        /// </summary>
         private MainWindowVM _mainWindowVM;
 
         /// <summary>
@@ -113,14 +106,13 @@ namespace SerialPortToNet
         // 串口->网络清空内容
         private void BtnSerialPortToNetClear_Click(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
-        Regex _numbetRegex = new Regex("[^0-9]+");
-        // 波特率通过事件限制输入数字
+        // 波特率输入框通过事件限制输入数字
         private void CobxBaudRate_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = _numbetRegex.IsMatch(e.Text);
+            e.Handled = new Regex("[^0-9]+").IsMatch(e.Text);
         }
     }
 }
