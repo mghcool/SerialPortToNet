@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO.Ports;
 using SerialPortToNet.Model;
 
@@ -9,6 +10,8 @@ namespace SerialPortToNet.ViewModel
     /// </summary>
     public class MainWindowVM : ObservableObject
     {
+        public string Title { get; set; } = $"网络转串口工具 v{FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).ProductVersion}";
+
         #region 串口配置
         #region 选项
         /// <summary>

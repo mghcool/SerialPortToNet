@@ -7,7 +7,7 @@
             DataContext="{StaticResource MainWindowVM}"
             xmlns:pu="https://opensource.panuon.com/wpf-ui" 
             mc:Ignorable="d"
-            Title="网络转串口工具"
+            Title="{Binding Title, Mode=OneWay}"
             Height="500"
             Width="860"
             FontFamily="{StaticResource PanuonIconFont}"
