@@ -5,7 +5,12 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>icon-256.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="icon-256.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Panuon.WPF.UI" Version="1.1.15.1" />
