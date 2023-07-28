@@ -154,7 +154,7 @@
                         VerticalAlignment="Center" 
                     />
                     <pu:NumberInput 
-                        Value="{Binding NetPort}"
+                        Value="{Binding NetPort, Mode=TwoWay}"
                         Foreground="Black"
                         Minimum="0"
                         Maximum="65535"
