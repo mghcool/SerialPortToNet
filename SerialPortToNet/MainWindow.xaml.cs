@@ -36,6 +36,11 @@ namespace SerialPortToNet
         private TcpListener? _tcpListener;
         private Socket? _tcpClient;
 
+        /// <summary>
+        /// TextBox可以显示的最大字符长度
+        /// </summary>
+        private const int _textBoxMaxShowLength = 40960;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -300,6 +305,11 @@ namespace SerialPortToNet
                     str += BytesToString(receiveData, _mainWindowVM.CheckedNet2SPortEncodingMode);
                     // 显示
                     _mainWindowVM.NetToSerialPortData += str;
+                    if(_mainWindowVM.NetToSerialPortData.Length > _textBoxMaxShowLength)
+                    {
+                        // 限制最长长度
+                        _mainWindowVM.NetToSerialPortData = _mainWindowVM.NetToSerialPortData[^_textBoxMaxShowLength..];
+                    }
                     Dispatcher.InvokeAsync(() => TbxNet2SPort.ScrollToEnd());
                 }
                 _tcpClient.Close();
@@ -343,6 +353,11 @@ namespace SerialPortToNet
             str += BytesToString(buffer, _mainWindowVM.CheckedSPort2NetEncodingMode);
             // 显示
             _mainWindowVM.SerialPortToNetData += str;
+            if (_mainWindowVM.SerialPortToNetData.Length > _textBoxMaxShowLength)
+            {
+                // 限制最长长度
+                _mainWindowVM.SerialPortToNetData = _mainWindowVM.SerialPortToNetData[^_textBoxMaxShowLength..];
+            }
             Dispatcher.InvokeAsync(() => TbxSPort2Net.ScrollToEnd());
         }
 
