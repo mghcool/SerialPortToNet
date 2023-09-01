@@ -121,10 +121,9 @@ namespace SerialPortToNet
                 if(_mainWindowVM.CheckedNetworkMode == 0)
                 {
                     // 服务模式
-                    _tcpListener = new TcpListener(IPAddress.Any, _mainWindowVM.NetPort);
+                    
                     try
                     {
-                        _tcpListener.Start(1);
                         StartTcpListen();
                     }
                     catch (Exception ex)
@@ -238,37 +237,19 @@ namespace SerialPortToNet
         /// </summary>
         private Task StartTcpListen()
         {
-            if (_tcpListener == null) return Task.CompletedTask;
+            _tcpListener = new TcpListener(IPAddress.Any, _mainWindowVM.NetPort);
+            _tcpListener.Start(1);
             return Task.Run(() =>
             {
-                while (true)
+                try
                 {
-                    Socket client;
-                    try
-                    {
-                        client = _tcpListener.AcceptSocket();
-                    }
-                    catch
-                    {
-                        break;
-                    }
-
-                    if (_tcpClient == null)
-                    {
-                        _tcpClient = client;
-                        _mainWindowVM.CurrentConnection = $"{_tcpClient.RemoteEndPoint}";
-                        TcpClientReceiveHandler();
-                        _serialPort.DataReceived += SerialPortReceiveHandler;
-                    }
-                    else
-                    {
-                        var sendData = Encoding.ASCII.GetBytes("The connection is not allowed because a client is currently connected .\r\n");
-                        client.Send(sendData);
-                        client.Disconnect(false);
-                        client.Close();
-                    }
+                    _tcpClient = _tcpListener.AcceptSocket();
+                    _mainWindowVM.CurrentConnection = $"{_tcpClient.RemoteEndPoint}";
+                    TcpClientReceiveHandler();
+                    _serialPort.DataReceived += SerialPortReceiveHandler;
+                    _tcpListener.Stop();
                 }
-                Debug.WriteLine("监听线程结束");
+                catch { }
             });
         }
 
@@ -319,11 +300,16 @@ namespace SerialPortToNet
                 if(_mainWindowVM.CheckedNetworkMode == NetworkMode.TCP客户端 && !_mainWindowVM.EditEnable)
                 {
                     // 当tcp连接断开时，如果是客户端模式，那么模拟点击一下停止按钮
-                    Dispatcher.InvokeAsync(() =>
+                    Dispatcher.Invoke(() =>
                     {
                         BtnStart_Click(new(), new());
                         Toast("连接已断开！");
                     });
+                }
+                if(_mainWindowVM.CheckedNetworkMode == NetworkMode.TCP服务器)
+                {
+                    // 重新开始监听
+                    StartTcpListen();
                 }
             });
         }
