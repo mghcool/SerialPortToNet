@@ -45,6 +45,7 @@ namespace SerialPortToNet
         {
             InitializeComponent();
             _mainWindowVM = (MainWindowVM)this.DataContext;
+            _serialPort.DataReceived += SerialPortReceiveHandler;
         }
 
         private void WindowX_Loaded(object sender, RoutedEventArgs e)
@@ -108,6 +109,7 @@ namespace SerialPortToNet
                 try
                 {
                     _serialPort.PortName = _portList.Keys.ToArray()[_mainWindowVM.CheckedPortNameIndex];
+                    _serialPort.BaudRate = _mainWindowVM.CheckedBaudRate;
                     _serialPort.DataBits = _mainWindowVM.CheckedDataBit;
                     _serialPort.Parity = _mainWindowVM.CheckedParity;
                     _serialPort.StopBits = (StopBits)_mainWindowVM.CheckedStopBitsIndex;
@@ -144,7 +146,6 @@ namespace SerialPortToNet
                         handler.Close();
                         _mainWindowVM.CurrentConnection = $"{_tcpClient.RemoteEndPoint}";
                         TcpClientReceiveHandler();
-                        _serialPort.DataReceived += SerialPortReceiveHandler;
                     }
                     catch (Exception ex)
                     {
@@ -246,7 +247,6 @@ namespace SerialPortToNet
                     _tcpClient = _tcpListener.AcceptSocket();
                     _mainWindowVM.CurrentConnection = $"{_tcpClient.RemoteEndPoint}";
                     TcpClientReceiveHandler();
-                    _serialPort.DataReceived += SerialPortReceiveHandler;
                     _tcpListener.Stop();
                 }
                 catch { }
@@ -295,7 +295,6 @@ namespace SerialPortToNet
                 }
                 _tcpClient.Close();
                 _tcpClient = null;
-                _serialPort.DataReceived -= SerialPortReceiveHandler;
                 _mainWindowVM.CurrentConnection = $"无";
                 if(_mainWindowVM.CheckedNetworkMode == NetworkMode.TCP客户端 && !_mainWindowVM.EditEnable)
                 {
@@ -306,7 +305,7 @@ namespace SerialPortToNet
                         Toast("连接已断开！");
                     });
                 }
-                if(_mainWindowVM.CheckedNetworkMode == NetworkMode.TCP服务器)
+                if(_mainWindowVM.CheckedNetworkMode == NetworkMode.TCP服务器 && !_mainWindowVM.EditEnable)
                 {
                     // 重新开始监听
                     StartTcpListen();
