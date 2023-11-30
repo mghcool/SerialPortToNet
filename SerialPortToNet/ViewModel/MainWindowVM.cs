@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO.Ports;
+using System.Reflection;
 using SerialPortToNet.Model;
 
 namespace SerialPortToNet.ViewModel
@@ -13,19 +14,7 @@ namespace SerialPortToNet.ViewModel
         /// <summary>
         /// 主窗口标题
         /// </summary>
-        public string Title
-        {
-            get
-            {
-                string title = "网络转串口工具";
-                string? fullPath = Process.GetCurrentProcess().MainModule?.FileName;
-                if (fullPath != null)
-                {
-                    title += $" v{FileVersionInfo.GetVersionInfo(fullPath).ProductVersion}";
-                }
-                return title;
-            }
-        }
+        public string Title => $"网络转串口工具v{Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)}";
 
         #region 串口配置
         #region 选项
